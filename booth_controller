@@ -1,0 +1,56 @@
+module booth_controller(lda,clra,sfta,ldq,clrq,sftq,ldm,clrff,addsub,start,decr,ldcnt,done,clk,q0,qm1,eqz);
+  
+  input clk,q0,qm1,start,eqz;
+  output  lda,clra,sfta,ldq,clrq,sftq,ldm,clrff,addsub,decr,ldcnt,done;
+  reg [2:0]state;
+  parameter s0=3'b000,
+            s1=3'b001,
+            s2=3'b010,
+            s3=3'b011,
+            s4=3'b100,
+            s5=3'b101,
+            s6=3'b110;
+  always @(posedge clk)
+    begin
+      case(state)
+        s0:if(start)
+          state<=s1;
+        s1:state<=s2;
+        s2:
+          begin
+         #2 if({q0,qm1}==2'b01)
+          state<=s3;
+        else if({q0,qm1}==2'b10)
+          state<=s4;
+        else
+          state<=s5;
+          end
+        s3:state<=s5;
+        s4:state<=s5;
+        s5:
+          begin
+           #2 if(({q0,qm1}==2'b01)&& !eqz)
+          state<=s3;
+        else if(({q0,qm1}==2'b10)&& !eqz)
+          state<=s4;
+        else if(eqz)
+          state<=s6;
+          end
+        s6:state=s6;
+        default:state<=s0;
+         
+      endcase
+    end
+  assign lda=((state==s3)||(state==s4))?1:0;
+  assign clra=(state==s0)?1:0;
+  assign sfta=(state==s5)?1:0;
+  assign ldq=(state==s2)?1:0;
+  assign clrq=(state==s0)?1:0;
+  assign sftq=(state==s5)?1:0;
+  assign ldm=(state==s1)?1:0;
+  assign clrff=(state==s0)?1:0;
+  assign addsub=(state==s3)?1:0;
+  assign decr=(state==s5)?1:0;
+  assign ldcnt=(state==s1)?1:0;
+  assign done=(state==s6)?1:0;
+endmodule

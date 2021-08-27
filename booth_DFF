@@ -1,0 +1,11 @@
+module booth_dff(clk,clr,d,q);
+  input clk,clr,d;
+  output reg q;
+  always @(posedge clk)
+    begin
+      if(clr)
+        q<=0;
+      else
+        q<=d;
+    end
+endmodule

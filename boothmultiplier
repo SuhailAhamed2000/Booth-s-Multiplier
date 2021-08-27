@@ -1,0 +1,18 @@
+module boothmul(clk,data_in,start,result);
+  input clk,start;
+  input [15:0]data_in;
+  output [15:0]result;
+  wire qm1,eqz;
+  wire lda,clra,sfta,ldq,clrq,sftq,ldm,ldcnt,decr,clrff,addsub,done;
+  wire [15:0]a,m,q,z;
+  wire [4:0] count;
+  assign eqz=~|count;
+  booth_shiftreg p(a,z,a[15],clk,lda,clra,sfta);
+  booth_shiftreg r(q,data_in,a[0],clk,ldq,clrq,sftq);
+  booth_dff s(clk,clrff,q[0],qm1);
+  booth_pipo t(clk,ldm,data_in,m);
+  booth_alu u(a,m,addsub,z);
+  booth_counter v(clk,decr,ldcnt,count);
+  booth_controller w(lda,clra,sfta,ldq,clrq,sftq,ldm,clrff,addsub,start,decr,ldcnt,done,clk,q[0],qm1,eqz);
+  assign result={a,q};
+endmodule

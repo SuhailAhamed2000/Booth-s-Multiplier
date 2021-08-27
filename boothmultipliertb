@@ -1,0 +1,23 @@
+module boothmul_tb();
+reg  clk,start;
+reg [15:0]data_in;
+  wire [15:0]result;
+boothmul k(clk,data_in,start,result);
+initial
+  begin
+    $dumpfile("boothmul_tb.vcd");
+    $dumpvars(0,boothmul_tb);
+  end
+initial
+  begin
+    clk=0;
+    forever #10 clk=~clk;
+  end
+initial
+  begin
+    @(negedge clk) start=1;
+    @(negedge clk) data_in= -31;
+    @(negedge clk) data_in= 28;
+    #500 $finish;
+  end
+endmodule
